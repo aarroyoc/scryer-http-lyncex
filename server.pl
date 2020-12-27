@@ -2,22 +2,36 @@
 :- use_module(library(lists)).
 :- use_module(library(charsio)).
 
-text_handler(http_request(_,_), http_response(200, text("Welcome to Scryer Prolog!"), [])).
+text_handler(Request, Response) :-
+    http_status_code(Response, 200),
+    http_body(Response, text("Welcome to Scryer Prolog!")).
 
-sample_handler(http_request(Headers, _), Response) :-
+sample_handler(Request, Response) :-
+    http_headers(Request, Headers),
     member("User-Agent"-UserAgent, Headers),
-    Response = http_response(200, text(UserAgent), ["Content-Type"-"text/plain", "Connection"-"Close"]).
+    http_body(Response, text(UserAgent)).
 
-sample_body_handler(http_request(_Headers, binary(Body)), http_response(200, binary(Body), ["Content-Type"-"application/json"])) :-
-    chars_utf8bytes(CharBody, Body),
-    write(CharBody).
+sample_body_handler(Request, Response) :-
+    http_body(Request, binary(Body)),
+    http_body(Response, binary(Body)),
+    http_headers(Response, ["Content-Type"-"application/json"]).
 
-text_echo_handler(http_request(_Headers, text(Body)), http_response(200, text(Body), ["Content-Type"-"application/json"])).
+text_echo_handler(Request, Response) :-
+    http_body(Request, text(TextBody)),
+    http_body(Response, text(TextBody)).
+
+parameter_handler(User, Request, Response) :-
+    http_body(Response, text(User)).
+
+redirect(Request, Response) :-
+    http_redirect(Response, "/").
 
 run :-
     http_listen(7890, [
-        get("/", text_handler),
-        get("/user-agent", sample_handler),
-        post("/echo", sample_body_handler),
-        post("/echo-text", text_echo_handler)
+        get([""], text_handler),
+        get(["user-agent"], sample_handler),
+        post(["echo"], sample_body_handler),
+        post(["echo-text"], text_echo_handler),
+        get(["user", User], parameter_handler(User)),
+        get(["redirectme"], redirect)
     ]).
