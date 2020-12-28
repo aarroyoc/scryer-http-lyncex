@@ -1,4 +1,5 @@
 from unittest import TestCase
+from hashlib import sha256
 
 import requests
 
@@ -35,3 +36,28 @@ class HttpGet(TestCase):
         r = requests.get(f"{self.base}/redirectme")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.text, "Welcome to Scryer Prolog!")
+
+    def test_search(self):
+        r = requests.get(f"{self.base}/search?q=backtracking")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.text, "Search term: backtracking")
+
+    def test_multiple_queries(self):
+        r = requests.get(f"{self.base}/search?x=100&q=unification&y=450")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.text, "Search term: unification")
+
+    def test_getfile(self):
+        r = requests.get(f"{self.base}/file")
+        self.assertEqual(r.status_code, 200)
+        file = open("comuneros.jpg", "rb")
+        h1 = sha256()
+        h2 = sha256()
+        h1.update(file.read())
+        h2.update(r.content)
+        self.assertEqual(h1.digest(), h2.digest())
+
+    def test_urlencode(self):
+        r = requests.get(f"{self.base}/search?q=adrián")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.text, "Search term: adrián")
