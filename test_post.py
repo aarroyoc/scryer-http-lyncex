@@ -18,3 +18,8 @@ class HttpPost(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertDictEqual(r.json(), {"sum": [1,2,3]})
 
+    def test_form(self):
+        r = requests.post(f"{self.base}/form", data={"key1": "value1", "key2": "value2"})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.text, "value2")
+

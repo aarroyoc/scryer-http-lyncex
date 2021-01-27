@@ -15,6 +15,7 @@ class HttpGet(TestCase):
     def test_get_notfound(self):
         r = requests.get(f"{self.base}/non-existing")
         self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.text, "URL not found: /non-existing")
     
     def test_useragent_text(self):
         headers = {'User-Agent': 'test-suite/0.0.1'}

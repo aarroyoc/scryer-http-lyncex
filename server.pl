@@ -35,14 +35,26 @@ search(Request, Response) :-
 file(Request, Response) :-
     http_body(Response, file('/home/aarroyoc/dev/scryer-http-test/comuneros.jpg')).
 
+form(Request, Response) :-
+    http_body(Request, form(Form)),
+    member("key2"-Value, Form),
+    http_body(Response, text(Value)).
+
+not_found(NotFound, Request, Response) :-
+    http_status_code(Response, 404),
+    phrase(format_("URL not found: ~s", [NotFound]), ResponseText),
+    http_body(Response, text(ResponseText)).
+
 run :-
     http_listen(7890, [
-        get('', text_handler),
+        get(/, text_handler),
         get('user-agent', sample_handler),
         post(echo, sample_body_handler),
         post('echo-text', text_echo_handler),
         get(user/User, parameter_handler(User)),
         get(redirectme, redirect),
         get(search, search),
-        get(file, file)
+        get(file, file),
+        post(form, form),
+        get(NotFound, not_found(NotFound))
     ]).
