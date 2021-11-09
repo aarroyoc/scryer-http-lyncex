@@ -1,10 +1,19 @@
+import subprocess
+import time
 from unittest import TestCase
 
 import requests
 
 class HttpPost(TestCase):
-    def setUp(self):
-        self.base = "http://localhost:7890"
+    @classmethod
+    def setUpClass(cls):
+        cls.base = "http://localhost:7890"
+        cls.server = subprocess.Popen(["/home/aarroyoc/dev/scryer-prolog/target/release/scryer-prolog","-g", "run","server.pl"])
+        time.sleep(10)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.terminate()
 
     def test_echo_text(self):
         r = requests.post(f"{self.base}/echo-text", data="Echo".encode("utf-8"))

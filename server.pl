@@ -1,4 +1,4 @@
-:- use_module(library(http/http_server)).
+:- use_module(http_server).
 :- use_module(library(lists)).
 :- use_module(library(dcgs)).
 :- use_module(library(format)).
@@ -33,7 +33,7 @@ search(Request, Response) :-
     http_body(Response, text(ResponseText)).
 
 file(Request, Response) :-
-    http_body(Response, file('/home/aarroyoc/dev/scryer-http-test/comuneros.jpg')).
+    http_body(Response, file("comuneros.jpg")).
 
 form(Request, Response) :-
     http_body(Request, form(Form)),
