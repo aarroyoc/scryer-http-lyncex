@@ -86,7 +86,7 @@ module_qualification(M, H0, H) :-
 http_listen_(Port, Handlers) :-
     must_be(integer, Port),
     must_be(list, Handlers),
-    once(socket_server_open(Port, Socket)),
+    once(socket_server_open('0.0.0.0':Port, Socket)),
     format("Listening at port ~d\n", [Port]),
     http_loop(Socket, Handlers).
 
